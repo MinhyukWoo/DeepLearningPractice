@@ -1,7 +1,7 @@
 """
 Notice: This project is not commercial. Just for educational.
 Indirectly and directly quoted from numpy.org
-https://numpy.org/doc/stable/user/absolute_beginners.html#how-to-import-numpy
+https://numpy.org/doc/stable/user/absolute_beginners.html
 """
 import time
 
