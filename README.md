@@ -1,5 +1,5 @@
-# DeepLearningPractice
-This is practice deep learning project.   
+# MachineLearningPractice
+This is practice machine learning project.   
 
 **Notice: This project is not commercial. Just for educational.**
 
