@@ -13,8 +13,18 @@ def relu(x: np.ndarray):
     return np.maximum(0, x)
 
 
+def relu_derived(x: np.ndarray):
+    out = np.zeros_like(x)
+    out[x > 0] = 1
+    return out
+
+
 def sigmoid(x: np.ndarray):
     return 1 / (1 + np.exp(-x))
+
+
+def sigmoid_derived(x: np.ndarray):
+    return sigmoid(x) * (1 - sigmoid(x))
 
 
 def soft_max(x: np.ndarray):
@@ -38,6 +48,10 @@ def cross_entropy_error(y: np.ndarray, t: np.ndarray):
     _batch_size = y.shape[0]
     _log = np.log(y[np.arange(_batch_size), t.argmax(axis=1)] + 1e-7)
     return -np.sum(_log) / _batch_size
+
+
+def soft_cross_onehot_derived(x: np.ndarray, y: np.ndarray):
+    return soft_max(x) - y
 
 
 if __name__ == '__main__':
