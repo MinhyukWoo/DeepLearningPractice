@@ -37,17 +37,8 @@ class TwoLayerNeuralNetwork:
         x = x @ self.__w_arr[-1] + self.__b_arr[-1]
         return self.__out_eval_f(x)
 
-    def __optimize(self, w_grad: np.ndarray, b_grad: np.ndarray) -> None:
-        for _i in range(len(w_grad)):
-            self.__b_arr[_i] -= self.__lr * b_grad[_i]
-            self.__w_arr[_i] -= self.__lr * w_grad[_i]
-
-    def fit(self, x: np.ndarray, y: np.ndarray):
-        # forward
-        x_list = self.__forward(x)
-
-        # backward
-        _dy_loss = x_list[-1] - y
+    def __backward(self, x_list: list, t: np.ndarray) -> (list, list):
+        _dy_loss = x_list[-1] - t
         _b_grad = []
         _w_grad = []
         for _i in reversed(range(len(self.__w_arr))):
@@ -55,11 +46,19 @@ class TwoLayerNeuralNetwork:
             _w_grad.append(np.transpose(x_list[_i]) @ _dy_loss)
             _dy_loss = _dy_loss @ np.transpose(self.__w_arr[_i])
             _dy_loss = _dy_loss * x_list[_i] * (1 - x_list[_i])
-        _b_grad.reverse()
         _w_grad.reverse()
+        _b_grad.reverse()
+        return _w_grad, _b_grad
 
-        # adjust
-        self.__optimize(_w_grad, _b_grad)
+    def __optimize(self, w_grad: list, b_grad: list) -> None:
+        for _i in range(len(w_grad)):
+            self.__b_arr[_i] -= self.__lr * b_grad[_i]
+            self.__w_arr[_i] -= self.__lr * w_grad[_i]
+
+    def fit(self, x: np.ndarray, t: np.ndarray):
+        x_list = self.__forward(x)
+        w_grad, b_grad = self.__backward(x_list, t)
+        self.__optimize(w_grad, b_grad)
 
     def predict_proba(self, x: np.ndarray):
         return self.__forward_fast(x)
