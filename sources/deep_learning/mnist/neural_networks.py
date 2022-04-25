@@ -19,41 +19,47 @@ class TwoLayerNeuralNetwork:
         self.__out_eval_f = functions.soft_max
         self.__loss_f = functions.cross_entropy_error
 
+    def __forward(self, x: np.ndarray) -> list:
+        x_list = [x]
+        for _i in range(len(self.__w_arr) - 1):
+            x = x @ self.__w_arr[_i] + self.__b_arr[_i]
+            x = self.__hidden_eval_f(x)
+            x_list.append(x)
+        x = x @ self.__w_arr[-1] + self.__b_arr[-1]
+        x = self.__out_eval_f(x)
+        x_list.append(x)
+        return x_list
+
+    def __forward_fast(self, x: np.ndarray) -> float:
+        for _i in range(len(self.__w_arr) - 1):
+            x = x @ self.__w_arr[_i] + self.__b_arr[_i]
+            x = self.__hidden_eval_f(x)
+        x = x @ self.__w_arr[-1] + self.__b_arr[-1]
+        return self.__out_eval_f(x)
+
     def fit(self, x: np.ndarray, y: np.ndarray):
         # forward
-        _x_arr = [x]
-        for i in range(len(self.__w_arr) - 1):
-            x = x @ self.__w_arr[i] + self.__b_arr[i]
-            x = self.__hidden_eval_f(x)
-            _x_arr.append(x)
-        x = x @ self.__w_arr[-1] + self.__b_arr[-1]
-        _p = self.__out_eval_f(x)
+        x_list = self.__forward(x)
 
         # backward
-        _dy_loss = _p - y
-        _b_grad = [np.sum(_dy_loss, axis=0)]
-        _w_grad = [np.transpose(_x_arr[-1]) @ _dy_loss]
-        _dy_loss = _dy_loss @ np.transpose(self.__w_arr[-1])
-        _dy_loss = _dy_loss * (_x_arr[-1] * (1 - _x_arr[-1]))
-        for i in reversed(range(len(self.__w_arr) - 1)):
+        _dy_loss = x_list[-1] - y
+        _b_grad = []
+        _w_grad = []
+        for _i in reversed(range(len(self.__w_arr))):
             _b_grad.append(np.sum(_dy_loss, axis=0))
-            _w_grad.append(np.transpose(_x_arr[i]) @ _dy_loss)
-            _dy_loss = _dy_loss @ np.transpose(self.__w_arr[i])
-            _dy_loss = _x_arr[i] * (1 - _x_arr[i])
+            _w_grad.append(np.transpose(x_list[_i]) @ _dy_loss)
+            _dy_loss = _dy_loss @ np.transpose(self.__w_arr[_i])
+            _dy_loss = _dy_loss * x_list[_i] * (1 - x_list[_i])
         _b_grad.reverse()
         _w_grad.reverse()
 
         # adjust
-        for i in range(len(_w_grad)):
-            self.__b_arr[i] -= self.__lr * _b_grad[i]
-            self.__w_arr[i] -= self.__lr * _w_grad[i]
+        for _i in range(len(_w_grad)):
+            self.__b_arr[_i] -= self.__lr * _b_grad[_i]
+            self.__w_arr[_i] -= self.__lr * _w_grad[_i]
 
     def predict_proba(self, x: np.ndarray):
-        for i in range(len(self.__w_arr) - 1):
-            x = x @ self.__w_arr[i] + self.__b_arr[i]
-            x = self.__hidden_eval_f(x)
-        x = x @ self.__w_arr[-1] + self.__b_arr[-1]
-        return self.__out_eval_f(x)
+        return self.__forward_fast(x)
 
     def score(self, x: np.ndarray, y: np.ndarray):
         _x_indices = np.argmax(self.predict_proba(x), axis=1)
