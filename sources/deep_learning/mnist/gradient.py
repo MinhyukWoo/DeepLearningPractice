@@ -39,14 +39,3 @@ def numerical_gradient_batch(
         return _grad_mat
     else:
         raise ValueError
-
-
-if __name__ == '__main__':
-    sample_2d = np.array([
-        [1, 3, 2, 4],
-        [5, 7, 9, 11],
-        [4, -3, 2, -1]
-    ], dtype=float)
-    print(numerical_gradient(lambda _x: np.sum(np.square(_x)), sample_2d))
-    print(numerical_gradient_batch(
-        lambda _x: np.sum(np.square(_x), axis=1), sample_2d))
