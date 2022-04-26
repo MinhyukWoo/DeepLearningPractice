@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 
 import mnist as mn
-from neural_networks import TwoLayerNeuralNetwork
+from neural_networks import NeuralNetworkClassifier
 import numpy as np
 
 
 if __name__ == '__main__':
     (train_data, train_label), (test_data, test_label) = mn.load_mnist(
         normalize=True, one_hot_label=True)
-    network = TwoLayerNeuralNetwork(784, 50, 10)
+    network = NeuralNetworkClassifier(784, 50, 10)
     repeat_size = 10000
     data_len = train_data.shape[0]
     batch_size = 100
