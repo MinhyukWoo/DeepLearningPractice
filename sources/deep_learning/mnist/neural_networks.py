@@ -3,17 +3,14 @@ import numpy as np
 
 
 class TwoLayerNeuralNetwork:
-    def __init__(self, input_size: int, hidden_size: int, output_size: int):
+    def __init__(self, input_size: int, hidden_size: int, output_size: int, hidden_layer_size: int = 1):
         np.random.seed(0)
-        self.__init_std = 0.01
-        self.__w_arr = [
-            self.__init_std * np.random.randn(input_size, hidden_size),
-            self.__init_std * np.random.randn(hidden_size, output_size)
-        ]
-        self.__b_arr = [
-            self.__init_std * np.random.randn(hidden_size),
-            self.__init_std * np.random.randn(output_size)
-        ]
+        __init_std = 0.01
+        n_sizes = [input_size]
+        n_sizes.extend([hidden_size for _ in range(hidden_layer_size)])
+        n_sizes.append(output_size)
+        self.__w_arr = [__init_std * np.random.randn(n_sizes[_i-1], n_sizes[_i]) for _i in range(1, len(n_sizes))]
+        self.__b_arr = [__init_std * np.random.randn(n_sizes[_i]) for _i in range(1, len(n_sizes))]
         self.__lr = 0.01
         self.__hidden_eval_f = functions.sigmoid
         self.__out_eval_f = functions.soft_max
